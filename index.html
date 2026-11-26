@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>人为什么要活着</title>
+    <meta name="theme-color" content="#1c2230" />
+    <link rel="stylesheet" href="base.css" />
+    <style>
+      :root {
+        --x-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC",
+          "Hiragino Sans GB", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+        --x-ink: rgba(255, 255, 255, 0.96);
+        --x-ink-2: rgba(255, 255, 255, 0.78);
+        --x-glass: rgba(255, 255, 255, 0.14);
+        --x-glass-hi: rgba(255, 255, 255, 0.22);
+        --x-edge: rgba(255, 255, 255, 0.28);
+        --x-solid: rgba(38, 44, 58, 0.92);
+        --x-shadow: 0 20px 50px -18px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.12);
+      }
+      html { background: #1c2230; }
+      body {
+        background: #1c2230;
+        color: var(--x-ink);
+        font-family: var(--x-font);
+        font-size: 17px;
+        line-height: 1.7;
+        letter-spacing: 0.01em;
+      }
+      ::selection { background: rgba(255, 255, 255, 0.3); }
+      :focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+      /* fixed photo behind everything, with a scrim for white text */
+      .x-bg {
+        position: fixed; inset: 0; z-index: 0;
+        width: 100vw; height: 100vh; height: 100lvh; max-width: none;
+        object-fit: cover; object-position: 70% 50%;
+      }
+      .x-scrim {
+        position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        background: linear-gradient(180deg, rgba(14, 18, 32, 0.5) 0%, rgba(14, 18, 32, 0.3) 45%, rgba(10, 16, 12, 0.62) 100%);
+      }
+
+      /* glass surface */
+      .x-glass {
+        position: relative;
+        background-color: rgba(22, 28, 44, 0.34);
+        background-image: linear-gradient(var(--x-glass), var(--x-glass));
+        -webkit-backdrop-filter: blur(30px) saturate(180%);
+        backdrop-filter: blur(30px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-top-color: var(--x-edge);
+        box-shadow: var(--x-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        isolation: isolate;
+      }
+      .x-glass::before {
+        content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1;
+        background: linear-gradient(160deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.03) 38%, rgba(255, 255, 255, 0) 60%);
+      }
+      @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+        .x-glass { background-color: var(--x-solid); background-image: none; }
+      }
+
+      .x-wrap {
+        position: relative; z-index: 1;
+        max-width: 760px; margin: 0 auto;
+        padding: 96px 20px 48px;
+        display: grid; gap: 28px;
+      }
+      .x-stack { display: grid; gap: inherit; min-width: 0; }
+
+      /* floating nav capsule */
+      .x-nav {
+        position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 10;
+        max-width: calc(100vw - 24px);
+        display: flex; gap: 2px; padding: 5px;
+        border-radius: 999px;
+        overflow-x: auto; scrollbar-width: none;
+      }
+      .x-nav::-webkit-scrollbar { display: none; }
+      .x-nav a {
+        flex: none; display: inline-flex; align-items: center;
+        min-height: 44px; padding: 0 16px; border-radius: 999px;
+        font-size: 14px; font-weight: 500; color: var(--x-ink); text-decoration: none; white-space: nowrap;
+        transition: background 0.2s ease;
+      }
+      .x-nav a:hover { background: rgba(255, 255, 255, 0.16); }
+
+      /* panels */
+      .x-panel {
+        border-radius: 28px;
+        padding: 40px 36px;
+        display: grid; gap: 20px;
+        scroll-margin-top: 80px;
+      }
+      .x-panel h2 { font-size: 26px; line-height: 1.35; font-weight: 600; letter-spacing: -0.01em; }
+      .x-panel p { color: var(--x-ink); }
+      .x-muted { color: var(--x-ink-2) !important; }
+      .x-small { font-size: 13px; color: var(--x-ink-2); }
+
+      .x-top { padding: 72px 36px 44px; gap: 24px; }
+      .x-top h1 {
+        font-size: clamp(44px, 9vw, 76px); line-height: 1.08; font-weight: 700; letter-spacing: -0.02em;
+        text-shadow: 0 2px 24px rgba(0, 0, 0, 0.25);
+      }
+      .x-top .x-lead { font-size: 19px; max-width: 30em; }
+
+      /* pill capsules */
+      .x-pill {
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        min-height: 44px; padding: 0 22px; border-radius: 999px;
+        font: inherit; font-size: 15px; font-weight: 500; color: var(--x-ink); text-decoration: none; cursor: pointer;
+        background: linear-gradient(var(--x-glass-hi), var(--x-glass-hi)), rgba(22, 28, 44, 0.4);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        backdrop-filter: blur(20px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-top-color: rgba(255, 255, 255, 0.4);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 4px 14px -6px rgba(0, 0, 0, 0.3);
+        transition: transform 0.18s ease, background 0.2s ease;
+      }
+      .x-pill:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.02); }
+      .x-pill:active { transform: scale(0.97); }
+      .x-pill--strong { background: rgba(255, 255, 255, 0.9); color: #1b2030; border-color: rgba(255, 255, 255, 0.9); }
+      .x-pill--strong:hover { background: #fff; }
+      @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+        .x-pill { background: rgba(70, 78, 96, 0.95); }
+        .x-pill--strong { background: rgba(255, 255, 255, 0.95); }
+      }
+      .x-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+      /* thinkers */
+      .x-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+      .x-card {
+        border-radius: 20px; padding: 20px 22px;
+        background: linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08)), rgba(22, 28, 44, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-top-color: rgba(255, 255, 255, 0.24);
+        display: grid; gap: 8px; align-content: start;
+      }
+      .x-card h3 { font-size: 17px; font-weight: 600; }
+      .x-card p { font-size: 15px; line-height: 1.7; }
+      .x-quote { font-size: 18px !important; font-weight: 500; }
+
+      /* small reasons */
+      .x-reasons { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 10px; }
+      .x-reasons li {
+        padding: 10px 18px; border-radius: 999px; font-size: 15px;
+        background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), rgba(22, 28, 44, 0.3); border: 1px solid rgba(255, 255, 255, 0.16);
+      }
+
+      /* write box */
+      .x-form { display: flex; gap: 10px; flex-wrap: wrap; }
+      .x-input {
+        flex: 1 1 240px; min-height: 48px; padding: 0 20px; border-radius: 999px;
+        font: inherit; font-size: 16px; color: var(--x-ink);
+        background: rgba(0, 0, 0, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      .x-input::placeholder { color: rgba(255, 255, 255, 0.6); }
+      .x-input:focus { outline: none; border-color: rgba(255, 255, 255, 0.6); background: rgba(0, 0, 0, 0.24); }
+      .x-examples { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+      .x-examples .x-pill { font-size: 14px; padding: 0 18px; background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), rgba(22, 28, 44, 0.3); }
+      .x-list { margin: 0; padding: 0; list-style: none; }
+      .x-list:empty { display: none; }
+      .x-list li { padding: 14px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.16); }
+      .x-list li:first-child { border-top: 1px solid rgba(255, 255, 255, 0.16); }
+
+      /* hotlines */
+      .x-lines { display: grid; gap: 10px; }
+      .x-line {
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;
+        padding: 14px 14px 14px 22px; border-radius: 22px;
+        background: linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08)), rgba(22, 28, 44, 0.3); border: 1px solid rgba(255, 255, 255, 0.14);
+      }
+
+      .x-end { text-align: center; padding: 44px 36px; }
+      .x-end p { font-size: 22px; font-weight: 500; }
+
+      .x-foot { text-align: center; padding: 8px 0 24px; }
+      .x-foot a { font-size: 13px; color: var(--x-ink-2); text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; }
+      .x-foot a:hover { color: var(--x-ink); }
+
+      @media (max-width: 600px) {
+        .x-wrap { padding: 84px 14px 32px; gap: 18px; }
+        .x-panel { padding: 28px 22px; border-radius: 24px; }
+        .x-top { padding: 48px 22px 32px; }
+        .x-panel h2 { font-size: 22px; }
+        .x-nav { left: 12px; right: 12px; transform: none; max-width: none; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { transition: none !important; animation: none !important; }
+        .x-pill:hover, .x-pill:active { transform: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <img class="x-bg" src="bg.jpg" alt="" aria-hidden="true" />
+    <div class="x-scrim" aria-hidden="true"></div>
+
+    <nav class="x-nav x-glass" aria-label="页面导航">
+      <a href="#truth">先说</a>
+      <a href="#thinkers">哲学家</a>
+      <a href="#ordinary">小理由</a>
+      <a href="#science">科学</a>
+      <a href="#write">你的理由</a>
+      <a href="#help">求助</a>
+    </nav>
+
+    <div class="x-wrap" id="top">
+      <main class="x-stack">
+        <header class="x-panel x-glass x-top">
+          <h1>人为什么要活着</h1>
+          <p class="x-lead">这个问题没有标准答案。不过人们找到过很多好理由，你也可以写下自己的。</p>
+          <p class="x-muted">今天可以先做一件小事，让自己或别人好一点点。</p>
+          <div class="x-row"><a class="x-pill x-pill--strong" href="#write">写下你的理由</a></div>
+        </header>
+
+        <section class="x-panel x-glass" id="truth">
+          <h2>问这个问题，一点也不奇怪。</h2>
+          <p>几乎每个认真生活的人都问过“为什么要活着”。会这样问，说明你在乎自己活得有没有意义。</p>
+        </section>
+
+        <section class="x-panel x-glass" id="thinkers">
+          <h2>哲学家们的答案不一样，但都很认真。</h2>
+          <div class="x-grid">
+            <div class="x-card">
+              <h3>加缪</h3>
+              <p class="x-quote">“应当想象西西弗斯是幸福的。”</p>
+              <p class="x-muted">人生也许没有预设的意义。但就像推石头的西西弗斯，人可以在反抗和投入里找到幸福。</p>
+            </div>
+            <div class="x-card">
+              <h3>弗兰克尔</h3>
+              <p class="x-muted">他在《活出生命的意义》里说，意义可以来自三个地方：做一件事；爱一个人，或体验一种美；还有面对无法改变的苦难时，你选择的态度。</p>
+            </div>
+            <div class="x-card">
+              <h3>亚里士多德</h3>
+              <p class="x-muted">活着是为了“好好地活”（eudaimonia），在发挥自己潜能的过程中成长。</p>
+            </div>
+            <div class="x-card">
+              <h3>庄子</h3>
+              <p class="x-muted">不必执着于一个终极目的。顺其自然、逍遥地活，本身就够了。</p>
+            </div>
+            <div class="x-card">
+              <h3>萨特</h3>
+              <p class="x-muted">存在先于本质。意义不是谁给你的，是你自己活出来的。</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="x-panel x-glass" id="ordinary">
+          <h2>普通人的理由，很多都很小，但足够真。</h2>
+          <ul class="x-reasons">
+            <li>想再见一次喜欢的人</li>
+            <li>还没吃过的好吃的</li>
+            <li>明天的天气和日出</li>
+            <li>一本没看完的书、一部没追完的剧</li>
+            <li>有人会因为你在而开心</li>
+            <li>还没去过的地方</li>
+            <li>还没成为的那个自己</li>
+            <li>一只等你回家的猫或狗</li>
+          </ul>
+        </section>
+
+        <section class="x-panel x-glass" id="science">
+          <h2>长久的满足，多半来自身边的人和投入做的事，而不是一次大成就。</h2>
+          <p>研究幸福感的心理学发现，长期的满足感主要来自四件事：亲密的关系，投入地做事（心流），帮助别人，还有感觉自己在成长。</p>
+          <p>哈佛成人发展研究跟踪了 80 多年，最明确的结论是：好的人际关系让人更健康，也更快乐。</p>
+        </section>
+
+        <section class="x-panel x-glass" id="write">
+          <h2>写下你自己的理由</h2>
+          <p class="x-muted">写一句，或者点一个例子。</p>
+          <form class="x-form" id="reason-form">
+            <input class="x-input" id="reason-input" type="text" maxlength="120" placeholder="我活着，是为了……" aria-label="一个活下去的理由" />
+            <button class="x-pill x-pill--strong" type="submit">留下这一条</button>
+          </form>
+          <ul class="x-examples" aria-label="例子">
+            <li><button class="x-pill x-example" type="button">为了明天早上的那杯咖啡</button></li>
+            <li><button class="x-pill x-example" type="button">为了爱我的人</button></li>
+            <li><button class="x-pill x-example" type="button">为了看看自己能走多远</button></li>
+          </ul>
+          <p class="x-small" id="reason-empty">你留下的理由会出现在这里。</p>
+          <ul class="x-list" id="reason-list" aria-live="polite"></ul>
+          <p class="x-small">这些理由只留在这个页面里，不会保存或上传，刷新后就没了。</p>
+        </section>
+
+        <section class="x-panel x-glass" id="help">
+          <h2>如果你现在很难受</h2>
+          <p>如果这个问题对你来说不是哲学，而是此刻真实的痛苦，请先找人说说话。朋友、家人都可以，也可以打专业热线。你值得被帮助。</p>
+          <div class="x-lines">
+            <div class="x-line">
+              <span>全国心理援助热线<br /><span class="x-small">24 小时</span></span>
+              <a class="x-pill x-pill--strong" href="tel:4001619995">400-161-9995</a>
+            </div>
+            <div class="x-line">
+              <span>北京心理危机研究与干预中心</span>
+              <a class="x-pill x-pill--strong" href="tel:01082951332">010-82951332</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="x-panel x-glass x-end">
+          <p>意义不是找到的，是一天一天活出来的。</p>
+        </section>
+      </main>
+    </div>
+    <script src="base.js"></script>
+    <script>
+      (function () {
+        var form = document.getElementById("reason-form");
+        var input = document.getElementById("reason-input");
+        var list = document.getElementById("reason-list");
+        var empty = document.getElementById("reason-empty");
+        function add(text) {
+          text = (text || "").trim();
+          if (!text) return;
+          var li = document.createElement("li");
+          li.textContent = text;
+          list.appendChild(li);
+          empty.hidden = true;
+        }
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          add(input.value);
+          input.value = "";
+          input.focus();
+        });
+        document.querySelectorAll(".x-example").forEach(function (b) {
+          b.addEventListener("click", function () { add(b.textContent); });
+        });
+      })();
+    </script>
+  </body>
+</html>
